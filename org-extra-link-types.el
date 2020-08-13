@@ -34,7 +34,14 @@
 ;;  telnet://ptt.cc
 (org-link-set-parameters "telnet" :follow #'telnet)
 
+;;===============================================================================
+;;; [ rss ]
 
+(defun org-rss-link-open (uri)
+  "Open rss:// URI link."
+  (eww uri))
+
+(org-link-set-parameters "rss" :follow #'org-rss-link-open)
 
 
 
