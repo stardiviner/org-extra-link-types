@@ -1,6 +1,6 @@
 ;;; org-extra-link-types.el --- Add extra link types to Org Mode -*- lexical-binding: t; -*-
 
-;;; Time-stamp: <2020-08-11 09:09:01 stardiviner>
+;;; Time-stamp: <2020-08-13 19:50:23 stardiviner>
 
 ;; Authors: stardiviner <numbchild@gmail.com>
 ;; Package-Requires: ((emacs "25.1") (olc "1.4.1"))
@@ -102,6 +102,55 @@ With prefix argument, also display headlines without a TODO keyword."
       (browse-url location))))
 
 (org-link-set-parameters "geo" :follow #'org-geo-link-open)
+
+;;===============================================================================
+;;; [ video ]
+
+;;; [[video:/path/to/file.mp4::00:13:20]]
+
+(defcustom org-video-link-open-command "mplayer"
+  "Specify the program for openning video: link."
+  :type 'string)
+
+(defvar org-video-link-extension-list '("avi" "rmvb" "ogg" "mp4" "mkv"))
+
+(defun org-video-link-open (uri)
+  "Open video file `URI' with video player."
+  (let* ((list (split-string uri "::"))
+         (path (car list))
+         (start-timstamp (cadr list)))
+    (make-process
+     :command (list org-video-link-open-command
+                    "-ss" start-timstamp
+                    (expand-file-name (org-link-unescape path)))
+     :name "org-video-link")))
+
+(defun org-video-complete-link (&optional arg)
+  "Create a video link using completion."
+  (let ((file (read-file-name "Video: " nil nil nil nil
+                              #'(lambda (file)
+                                  (seq-contains-p
+                                   org-video-link-extension-list
+                                   (file-name-extension file)))))
+        (pwd (file-name-as-directory (expand-file-name ".")))
+        (pwd1 (file-name-as-directory (abbreviate-file-name
+                                       (expand-file-name ".")))))
+    (cond ((equal arg '(16))
+           (concat "video:"
+                   (abbreviate-file-name (expand-file-name file))))
+          ((string-match
+            (concat "^" (regexp-quote pwd1) "\\(.+\\)") file)
+           (concat "video:" (match-string 1 file)))
+          ((string-match
+            (concat "^" (regexp-quote pwd) "\\(.+\\)")
+            (expand-file-name file))
+           (concat "video:"
+                   (match-string 1 (expand-file-name file))))
+          (t (concat "video:" file)))))
+
+(org-link-set-parameters "video"
+                         :follow #'org-video-link-open
+                         :complete #'org-video-complete-link)
 
 
 
