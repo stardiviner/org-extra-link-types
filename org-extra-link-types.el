@@ -55,6 +55,15 @@ With prefix argument, also display headlines without a TODO keyword."
 
 (org-link-set-parameters "tag" :follow #'org-tag-link-open)
 
+;;===============================================================================
+;;; [ track ]
+
+;;; `track:' for OSM Maps
+;; [[track:((9.707032442092896%2052.37033874553582)(9.711474180221558%2052.375238282987))data/images/org-osm-link.svg][Open this link will generate svg, png image for track link on map]]
+
+(if (featurep 'org-osm-link)
+    (require 'org-osm-link))
+
 
 
 (provide 'org-extra-link-types)
