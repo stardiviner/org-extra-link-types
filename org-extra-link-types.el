@@ -3,7 +3,7 @@
 ;;; Time-stamp: <2020-08-11 09:09:01 stardiviner>
 
 ;; Authors: stardiviner <numbchild@gmail.com>
-;; Package-Requires: ((emacs "25.1"))
+;; Package-Requires: ((emacs "25.1") (olc "1.4.1"))
 ;; Package-Version: 0.1
 ;; Keywords: org
 ;; homepage: https://github.com/stardiviner/org-extra-link-types
@@ -63,6 +63,45 @@ With prefix argument, also display headlines without a TODO keyword."
 
 (if (featurep 'org-osm-link)
     (require 'org-osm-link))
+
+;;===============================================================================
+;;; [ geo ]
+
+;;; `geo:'
+;; [geo:37.786971,-122.399677;u=35]
+;; [[geo:58.397813,15.576063]]
+;; [[geo:9FCQ9HXG+4CG]]
+
+;;; Open Location Code library `olc'
+(autoload 'olc-encode "olc")
+(autoload 'olc-decode "olc")
+
+(defcustom org-geo-link-application-command "gnome-maps"
+  "Specify the program name for openning geo: link."
+  :type 'string)
+
+(defun org-geo-link-open (link)
+  "Open Geography location `URI' like \"geo:25.5889136,100.2208514\" in Map application."
+  (let ((location (cond
+                   ;; (string-match-p "\\,.*" "25.5889136,100.2208514")
+                   ((string-match-p "\\,.*" link)
+                    link)
+                   ;; (string-match-p "\\+.*" "9FCQ9HXG+4CG")
+                   ((string-match-p "\\+.*" link)
+                    (when (featurep 'olc)
+                      (format "%s,%s"
+                              (olc-area-lat (olc-decode link))
+                              (olc-area-lon (olc-decode link)))))
+                   (t (user-error "Your link is not Geo location or Open Location Code!")))))
+    (if (executable-find org-geo-link-application-command)
+        (start-process
+         "org-geo-link-open"
+         "*org-geo-link-open*"
+         org-geo-link-application-command
+         (shell-quote-wildcard-pattern location))
+      (browse-url location))))
+
+(org-link-set-parameters "geo" :follow #'org-geo-link-open)
 
 
 
