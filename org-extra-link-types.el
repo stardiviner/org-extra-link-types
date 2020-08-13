@@ -43,6 +43,18 @@
 
 (org-link-set-parameters "rss" :follow #'org-rss-link-open)
 
+;;===============================================================================
+;;; [ tag ]
+
+;; e.g. [[tag:work+phonenumber-boss][Optional Description]]
+
+(defun org-tag-link-open (tag)
+  "Display a list of TODO headlines with tag TAG.
+With prefix argument, also display headlines without a TODO keyword."
+  (org-tags-view (null current-prefix-arg) tag))
+
+(org-link-set-parameters "tag" :follow #'org-tag-link-open)
+
 
 
 (provide 'org-extra-link-types)
