@@ -28,7 +28,11 @@
 
 ;;; Code:
 
+;;===============================================================================
+;;; [ telnet ]
 
+;;  telnet://ptt.cc
+(org-link-set-parameters "telnet" :follow #'telnet)
 
 
 
